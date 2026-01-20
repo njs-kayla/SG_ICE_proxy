@@ -1,12 +1,17 @@
 {
-  "name": "sg_ice_proxy",
+  "name": "sg-ice-admin",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "SBC 2026 Event Registration Admin System",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd frontend && npm run start",
+    "lint": "cd frontend && npm run lint",
+    "install-all": "npm install && cd frontend && npm install"
   },
+  "keywords": ["event", "registration", "admin"],
   "author": "",
-  "license": "ISC",
-  "private": true
+  "license": "MIT"
 }
+
