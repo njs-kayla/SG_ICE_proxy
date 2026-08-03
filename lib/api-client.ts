@@ -1,6 +1,14 @@
 'use client';
 
 import axios, { AxiosInstance } from 'axios';
+import {
+  exportMockCsv,
+  getAllMockEntries,
+  getMockEntries,
+  getMockStats,
+  isMockMode,
+  resendMockEmail,
+} from '@/lib/mock-data';
 
 interface GetEntriesOptions {
   page?: number;
@@ -60,6 +68,10 @@ class ApiClient {
   }
 
   async getEntries(options: GetEntriesOptions = {}): Promise<EntriesResponse> {
+    if (isMockMode()) {
+      return getMockEntries(options);
+    }
+
     try {
       const { data } = await this.client.get<EntriesResponse>('/api/entries', {
         params: {
@@ -76,6 +88,10 @@ class ApiClient {
   }
 
   async getAllEntries(options: Omit<GetEntriesOptions, 'page' | 'pageSize'> = {}): Promise<EntryRecord[]> {
+    if (isMockMode()) {
+      return getAllMockEntries(options);
+    }
+
     const pageSize = 1000;
     const firstPage = await this.getEntries({
       ...options,
@@ -99,6 +115,10 @@ class ApiClient {
   }
 
   async resendEmail(row: number): Promise<ResendResponse> {
+    if (isMockMode()) {
+      return resendMockEmail(row);
+    }
+
     try {
       const { data } = await this.client.post<ResendResponse>('/api/resend', {
         row,
@@ -110,6 +130,13 @@ class ApiClient {
   }
 
   async getStats(): Promise<StatsResponse> {
+    if (isMockMode()) {
+      return {
+        ok: true,
+        ...getMockStats(),
+      };
+    }
+
     try {
       const { data } = await this.client.get<StatsResponse>('/api/stats');
       return data;
@@ -119,6 +146,19 @@ class ApiClient {
   }
 
   async exportCsv(): Promise<void> {
+    if (isMockMode()) {
+      const csv = exportMockCsv();
+      const url = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'mock-export.csv');
+      document.body.appendChild(link);
+      link.click();
+      link.parentElement?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      return;
+    }
+
     try {
       const response = await this.client.get('/api/export', {
         responseType: 'blob',

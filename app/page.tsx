@@ -4,12 +4,14 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Lock, AlertCircle } from 'lucide-react';
 import axios from 'axios';
+import { getMockToken, isMockMode } from '@/lib/mock-data';
 
 export default function LoginPage() {
   const router = useRouter();
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const mockMode = isMockMode();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +19,12 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
+      if (mockMode) {
+        localStorage.setItem('token', getMockToken());
+        router.push('/dashboard');
+        return;
+      }
+
       const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
       const response = await axios.post(`${baseURL}/api/auth`, { password });
 
@@ -49,8 +57,16 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">Enter your password to access the admin panel</p>
+            <p className="text-gray-600">
+              {mockMode ? 'Local mock mode is enabled. Sign in to preview the UI with demo data.' : 'Enter your password to access the admin panel'}
+            </p>
           </div>
+
+          {mockMode && (
+            <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              Local preview mode is using fake participant data and bypassing API authentication.
+            </div>
+          )}
 
           {/* Error Message */}
           {error && (
@@ -67,10 +83,10 @@ export default function LoginPage() {
                 Password
               </label>
               <input
-                type="password"
+                type={mockMode ? 'text' : 'password'}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter admin password"
+                placeholder={mockMode ? 'Any text is fine in local mock mode' : 'Enter admin password'}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 disabled={loading}
                 autoFocus
@@ -90,7 +106,7 @@ export default function LoginPage() {
               ) : (
                 <>
                   <Lock size={18} />
-                  Sign In
+                  {mockMode ? 'Enter Demo Dashboard' : 'Sign In'}
                 </>
               )}
             </button>

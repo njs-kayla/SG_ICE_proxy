@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { RefreshCw, Download, Copy, Check, Send, Search, ChevronLeft, ChevronRight } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
+import { isMockMode } from '@/lib/mock-data';
 
 interface Stats {
   total: number;
@@ -92,6 +93,7 @@ function getStatusLabel(status: string) {
 }
 
 export default function DashboardPage() {
+  const mockMode = isMockMode();
   const [stats, setStats] = useState<Stats | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [tableEntries, setTableEntries] = useState<Entry[]>([]);
@@ -260,6 +262,12 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {mockMode && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Local mock mode is active. The dashboard is showing fake participant data and local-only actions.
+        </div>
+      )}
+
       {/* Stats Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Total Participants */}
@@ -315,21 +323,6 @@ export default function DashboardPage() {
             {copied ? 'Copied!' : `Copy ${activeDay.day} Codes`}
           </button>
         </div>
-      </div>
-
-      {/* Daily Breakdown Chart */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h2 className="text-lg font-bold text-gray-900 mb-4">Daily Breakdown</h2>
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={dailyData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip />
-            <Legend />
-            <Bar dataKey="entries" name="Participants" fill="#3b82f6" radius={[8, 8, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
       </div>
 
       {/* Recent Entries Table */}
