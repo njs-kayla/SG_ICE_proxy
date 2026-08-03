@@ -96,16 +96,13 @@ export default function DashboardPage() {
   const mockMode = isMockMode();
   const [stats, setStats] = useState<Stats | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
-  const [tableEntries, setTableEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tableLoading, setTableLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<string>('');
   const [copied, setCopied] = useState(false);
   const [resendingRow, setResendingRow] = useState<number | null>(null);
   const [message, setMessage] = useState('');
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalEntries, setTotalEntries] = useState(0);
   const [keyword, setKeyword] = useState('');
   const [searchInput, setSearchInput] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -136,7 +133,17 @@ export default function DashboardPage() {
     .filter((entry) => toDateKey(entry.createdAt) === activeDay.dateKey)
     .map((entry) => entry.raffleCode)
     .join('\n');
+  const filteredEntries = entries.filter((entry) => {
+    const matchesKeyword = !keyword || [entry.name, entry.email, entry.company]
+      .some((field) => field && field.toLowerCase().includes(keyword.toLowerCase()));
+    const matchesStatus = !statusFilter || entry.status === statusFilter;
+
+    return matchesKeyword && matchesStatus;
+  });
+  const totalEntries = filteredEntries.length;
   const totalPages = Math.max(1, Math.ceil(totalEntries / pageSize));
+  const currentPage = Math.min(page, totalPages);
+  const tableEntries = filteredEntries.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const fetchSummaryData = async () => {
     setLoading(true);
@@ -157,40 +164,17 @@ export default function DashboardPage() {
     }
   };
 
-  const fetchTableData = async () => {
-    setTableLoading(true);
-    setMessage('');
-    try {
-      const data = await apiClient.getEntries({
-        page,
-        pageSize,
-        keyword: keyword || undefined,
-        status: statusFilter || undefined,
-      });
-      setTableEntries(data.rows);
-      setTotalEntries(data.total);
-      setLastUpdated(new Date().toLocaleTimeString());
-    } catch (error) {
-      console.error('Failed to fetch table data:', error);
-      setMessage(error instanceof Error ? error.message : 'Failed to fetch participant list');
-    } finally {
-      setTableLoading(false);
-    }
-  };
-
-  const fetchData = async () => {
-    await Promise.all([fetchSummaryData(), fetchTableData()]);
-  };
-
   useEffect(() => {
-    fetchData();
-    const interval = setInterval(fetchData, 60000); // 每分鐘刷新一次
+    fetchSummaryData();
+    const interval = setInterval(fetchSummaryData, 60000); // 每分鐘刷新一次
     return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
-    fetchTableData();
-  }, [page, pageSize, keyword, statusFilter]);
+    if (page > totalPages) {
+      setPage(totalPages);
+    }
+  }, [page, totalPages]);
 
   const handleSearch = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -215,7 +199,7 @@ export default function DashboardPage() {
     try {
       await apiClient.resendEmail(row);
       setMessage('Email resent successfully.');
-      await fetchData();
+      await fetchSummaryData();
     } catch (error) {
       setMessage(error instanceof Error ? error.message : 'Failed to resend email');
     } finally {
@@ -238,7 +222,7 @@ export default function DashboardPage() {
         <div className="flex gap-2 items-center">
           <span className="text-sm text-gray-500">Last updated {lastUpdated}</span>
           <button
-            onClick={fetchData}
+            onClick={fetchSummaryData}
             disabled={loading}
             className="px-3 py-2 hover:bg-gray-100 rounded-lg transition flex gap-2 items-center text-sm font-medium text-gray-700"
             title="Refresh"
@@ -405,11 +389,10 @@ export default function DashboardPage() {
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">COMPANY</th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">CODE</th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">EMAIL STATUS</th>
-                <th className="px-6 py-3 text-left font-semibold text-gray-700">ACTION</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {tableLoading ? (
+              {loading ? (
                 <tr>
                   <td colSpan={7} className="px-6 py-8 text-center text-gray-500">
                     載入中...
@@ -445,25 +428,6 @@ export default function DashboardPage() {
                         ) : null}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <button
-                        onClick={() => handleResend(entry.row)}
-                        disabled={resendingRow === entry.row}
-                        className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg flex gap-2 items-center transition"
-                      >
-                        {resendingRow === entry.row ? (
-                          <>
-                            <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent"></span>
-                            Sending...
-                          </>
-                        ) : (
-                          <>
-                            <Send size={14} />
-                            Resend
-                          </>
-                        )}
-                      </button>
-                    </td>
                   </tr>
                 ))
               )}
@@ -473,13 +437,13 @@ export default function DashboardPage() {
 
         <div className="flex flex-col gap-3 border-t border-gray-200 px-6 py-4 text-sm text-gray-600 lg:flex-row lg:items-center lg:justify-between">
           <span>
-            Showing {totalEntries === 0 ? 0 : (page - 1) * pageSize + 1} to {Math.min(page * pageSize, totalEntries)} of {totalEntries} participants
+            Showing {totalEntries === 0 ? 0 : (currentPage - 1) * pageSize + 1} to {Math.min(currentPage * pageSize, totalEntries)} of {totalEntries} participants
           </span>
 
           <div className="flex items-center gap-2">
             <button
               onClick={() => setPage((currentPage) => Math.max(1, currentPage - 1))}
-              disabled={page === 1 || tableLoading}
+              disabled={currentPage === 1 || loading}
               className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 transition hover:bg-gray-50 disabled:opacity-50"
             >
               <ChevronLeft size={16} />
@@ -487,12 +451,12 @@ export default function DashboardPage() {
             </button>
 
             <span className="rounded-lg border border-gray-300 bg-gray-50 px-3 py-2 font-medium text-gray-700">
-              Page {page} / {totalPages}
+              Page {currentPage} / {totalPages}
             </span>
 
             <button
               onClick={() => setPage((currentPage) => Math.min(totalPages, currentPage + 1))}
-              disabled={page === totalPages || tableLoading}
+              disabled={currentPage === totalPages || loading}
               className="flex items-center gap-2 rounded-lg border border-gray-300 px-3 py-2 transition hover:bg-gray-50 disabled:opacity-50"
             >
               Next

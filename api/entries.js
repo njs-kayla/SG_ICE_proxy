@@ -9,6 +9,7 @@ import { filterAndPaginate } from "../lib/data-filters.js";
  * 取得 Google Sheet 所有報名資料，支援分頁、搜尋、篩選
  * 
  * Query String:
+ *   - all: 是否返回全部資料（true 時不做分頁）
  *   - page: 頁碼（預設 1）
  *   - pageSize: 每頁筆數（預設 20）
  *   - keyword: 搜尋關鍵字（搜尋 name, email, company, phone, message）
@@ -65,6 +66,7 @@ export default async function handler(req, res) {
     const pageSize = parseInt(url.searchParams.get("pageSize") || "20", 10);
     const keyword = url.searchParams.get("keyword") || "";
     const status = url.searchParams.get("status") || "";
+    const all = url.searchParams.get("all") === "true";
 
     // 向 GAS 請求全部資料
     // GAS 端應該接收 action=getEntries 並返回 JSON 格式的所有記錄
@@ -87,6 +89,19 @@ export default async function handler(req, res) {
     let rows = gasData.rows || [];
     if (!Array.isArray(rows)) {
       rows = [];
+    }
+
+    if (all) {
+      const filtered = filterAndPaginate(rows, { keyword, status, page: 1, pageSize: rows.length || 1 });
+
+      const response = successResponse({
+        total: filtered.total,
+        page: 1,
+        pageSize: filtered.total,
+        rows: filtered.rows,
+      });
+
+      return respondJson(res, response);
     }
 
     // 應用分頁、搜尋、篩選

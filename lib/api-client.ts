@@ -11,6 +11,7 @@ import {
 } from '@/lib/mock-data';
 
 interface GetEntriesOptions {
+  all?: boolean;
   page?: number;
   pageSize?: number;
   keyword?: string;
@@ -75,6 +76,7 @@ class ApiClient {
     try {
       const { data } = await this.client.get<EntriesResponse>('/api/entries', {
         params: {
+          ...(options.all && { all: true }),
           page: options.page || 1,
           pageSize: options.pageSize || 20,
           ...(options.keyword && { keyword: options.keyword }),
@@ -92,26 +94,12 @@ class ApiClient {
       return getAllMockEntries(options);
     }
 
-    const pageSize = 1000;
-    const firstPage = await this.getEntries({
+    const response = await this.getEntries({
       ...options,
-      page: 1,
-      pageSize,
+      all: true,
     });
 
-    const allRows = [...firstPage.rows];
-    const totalPages = Math.ceil(firstPage.total / pageSize);
-
-    for (let page = 2; page <= totalPages; page += 1) {
-      const nextPage = await this.getEntries({
-        ...options,
-        page,
-        pageSize,
-      });
-      allRows.push(...nextPage.rows);
-    }
-
-    return allRows;
+    return response.rows;
   }
 
   async resendEmail(row: number): Promise<ResendResponse> {
