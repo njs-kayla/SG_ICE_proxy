@@ -1,17 +1,8 @@
-'use client';
+"use client";
 
-import axios, { AxiosInstance } from 'axios';
-import {
-  exportMockCsv,
-  getAllMockEntries,
-  getMockEntries,
-  getMockStats,
-  isMockMode,
-  resendMockEmail,
-} from '@/lib/mock-data';
+import axios, { AxiosInstance } from "axios";
 
 interface GetEntriesOptions {
-  all?: boolean;
   page?: number;
   pageSize?: number;
   keyword?: string;
@@ -31,7 +22,7 @@ interface EntriesResponse extends ApiResponse<void> {
   rows: any[];
 }
 
-type EntryRecord = EntriesResponse['rows'][number];
+type EntryRecord = EntriesResponse["rows"][number];
 
 interface StatsResponse extends ApiResponse<void> {
   total: number;
@@ -50,17 +41,17 @@ class ApiClient {
   private baseURL: string;
 
   constructor() {
-    this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
+    this.baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || "";
     this.client = axios.create({
       baseURL: this.baseURL,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
     });
 
     // Add token to headers if available
     this.client.interceptors.request.use((config) => {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem("token");
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
@@ -69,14 +60,9 @@ class ApiClient {
   }
 
   async getEntries(options: GetEntriesOptions = {}): Promise<EntriesResponse> {
-    if (isMockMode()) {
-      return getMockEntries(options);
-    }
-
     try {
-      const { data } = await this.client.get<EntriesResponse>('/api/entries', {
+      const { data } = await this.client.get<EntriesResponse>("/api/entries", {
         params: {
-          ...(options.all && { all: true }),
           page: options.page || 1,
           pageSize: options.pageSize || 20,
           ...(options.keyword && { keyword: options.keyword }),
@@ -85,82 +71,75 @@ class ApiClient {
       });
       return data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.msg || 'Failed to fetch entries');
+      throw new Error(error.response?.data?.msg || "Failed to fetch entries");
     }
   }
 
-  async getAllEntries(options: Omit<GetEntriesOptions, 'page' | 'pageSize'> = {}): Promise<EntryRecord[]> {
-    if (isMockMode()) {
-      return getAllMockEntries(options);
-    }
-
-    const response = await this.getEntries({
+  async getAllEntries(
+    options: Omit<GetEntriesOptions, "page" | "pageSize"> = {},
+  ): Promise<EntryRecord[]> {
+    const pageSize = 1000;
+    const firstPage = await this.getEntries({
       ...options,
-      all: true,
+      page: 1,
+      pageSize,
     });
 
-    return response.rows;
+    const allRows = [...firstPage.rows];
+    const totalPages = Math.ceil(firstPage.total / pageSize);
+
+    for (let page = 2; page <= totalPages; page += 1) {
+      const nextPage = await this.getEntries({
+        ...options,
+        page,
+        pageSize,
+      });
+      allRows.push(...nextPage.rows);
+    }
+
+    return allRows;
   }
 
   async resendEmail(row: number): Promise<ResendResponse> {
-    if (isMockMode()) {
-      return resendMockEmail(row);
-    }
-
     try {
-      const { data } = await this.client.post<ResendResponse>('/api/resend', {
+      const { data } = await this.client.post<ResendResponse>("/api/resend", {
         row,
       });
       return data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.msg || 'Failed to resend email');
+      throw new Error(error.response?.data?.msg || "Failed to resend email");
     }
   }
 
   async getStats(): Promise<StatsResponse> {
-    if (isMockMode()) {
-      return {
-        ok: true,
-        ...getMockStats(),
-      };
-    }
-
     try {
-      const { data } = await this.client.get<StatsResponse>('/api/stats');
+      const { data } = await this.client.get<StatsResponse>("/api/stats");
       return data;
     } catch (error: any) {
-      throw new Error(error.response?.data?.msg || 'Failed to fetch stats');
+      throw new Error(error.response?.data?.msg || "Failed to fetch stats");
     }
   }
 
   async exportCsv(): Promise<void> {
-    if (isMockMode()) {
-      const csv = exportMockCsv();
-      const url = window.URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', 'mock-export.csv');
-      document.body.appendChild(link);
-      link.click();
-      link.parentElement?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      return;
-    }
-
     try {
-      const response = await this.client.get('/api/export', {
-        responseType: 'blob',
+      const response = await this.client.get("/api/export", {
+        responseType: "blob",
       });
-      
-      const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+
+      // Axios 已經回傳 Blob，直接使用即可
+      const url = window.URL.createObjectURL(response.data);
+
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', 'export.csv');
+      link.download = "export.csv";
+
       document.body.appendChild(link);
       link.click();
-      link.parentElement?.removeChild(link);
+      document.body.removeChild(link);
+
+      window.URL.revokeObjectURL(url);
     } catch (error: any) {
-      throw new Error(error.response?.data?.msg || 'Failed to export CSV');
+      throw new Error(error.response?.data?.msg || "Failed to export CSV");
     }
   }
 }
