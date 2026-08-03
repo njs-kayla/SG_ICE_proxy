@@ -15,20 +15,18 @@
 
 1. **複製環境變數配置**
 ```bash
-cd frontend
 cp .env.example .env.local
 ```
 
-2. **編輯環境變數** (`frontend/.env.local`)
+2. **編輯環境變數** (`.env.local`)
 ```env
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_API_BASE_URL=
 ADMIN_PASSWORD=your-secure-password
 JWT_SECRET=your-jwt-secret
 ```
 
 3. **安裝依賴**
 ```bash
-cd frontend
 npm install
 ```
 
@@ -53,42 +51,39 @@ SG_ICE_proxy/
 │   ├── cors.js                  # CORS 設置
 │   ├── errors.js                # 錯誤回應格式
 │   ├── gas-request.js           # GAS 通訊層
-│   └── data-filters.js          # 數據篩選/分頁
-├── frontend/                    # Next.js 前端應用
-│   ├── app/
-│   │   ├── page.tsx             # 登錄頁面
-│   │   ├── layout.tsx           # 全域版面配置
-│   │   ├── globals.css          # 全域樣式
-│   │   ├── api/auth/route.ts    # 認證 API
-│   │   └── dashboard/
-│   │       ├── page.tsx         # 儀表板主頁
-│   │       ├── layout.tsx       # 儀表板版面配置
-│   │       ├── entries/
-│   │       │   └── page.tsx     # 註冊列表頁面
-│   │       └── resend/
-│   │           └── page.tsx     # 重新寄送頁面
-│   ├── components/
-│   │   ├── Sidebar.tsx          # 側邊導航欄
-│   │   ├── Header.tsx           # 頁面標題欄
-│   │   ├── EntriesTable.tsx     # 表格元件
-│   │   └── Chart.tsx            # 圖表元件
-│   ├── lib/
-│   │   └── api-client.ts        # Axios API 用戶端
-│   ├── package.json             # 依賴宣告
-│   ├── tsconfig.json            # TypeScript 配置
-│   ├── tailwind.config.js       # Tailwind CSS 配置
-│   ├── next.config.js           # Next.js 配置
-│   ├── postcss.config.js        # PostCSS 配置
-│   └── .env.example             # 環境變數範例
+│   ├── data-filters.js          # 數據篩選/分頁
+│   └── api-client.ts            # Axios API 用戶端
+├── app/
+│   ├── page.tsx                 # 登錄頁面
+│   ├── layout.tsx               # 全域版面配置
+│   ├── globals.css              # 全域樣式
+│   ├── api/auth/route.ts        # 認證 API
+│   └── dashboard/
+│       ├── page.tsx             # 儀表板主頁
+│       ├── layout.tsx           # 儀表板版面配置
+│       ├── entries/
+│       │   └── page.tsx         # 註冊列表頁面
+│       └── resend/
+│           └── page.tsx         # 重新寄送頁面
+├── components/
+│   ├── Sidebar.tsx              # 側邊導航欄
+│   └── Header.tsx               # 頁面標題欄
+├── next.config.js               # Next.js 配置
+├── postcss.config.js            # PostCSS 配置
+├── tailwind.config.js           # Tailwind CSS 配置
+├── tsconfig.json                # TypeScript 配置
+├── next-env.d.ts                # Next.js 類型宣告
+├── .env.example                 # 環境變數範例
 ├── GAS_backend.gs               # Google Apps Script 後端
 ├── package.json                 # 根專案配置
+├── vercel.json                  # Vercel 配置
 └── README.md                    # 本檔案
 ```
 
 ## 🔑 環境變數配置
 
-### 前端 (`frontend/.env.local`)
-- `NEXT_PUBLIC_API_BASE_URL` - API 基礎 URL (預設: http://localhost:3000)
+### 前端 (`.env.local`)
+- `NEXT_PUBLIC_API_BASE_URL` - API 基礎 URL (留空時使用同網域 `/api/*`；本機如需顯式指定可填 `http://localhost:3000`)
 - `ADMIN_PASSWORD` - 管理員密碼
 - `JWT_SECRET` - JWT 簽名密鑰
 
@@ -194,9 +189,13 @@ GET /api/export
    - `ADMIN_PASSWORD`
    - `JWT_SECRET`
    - `BREVO_API_KEY`
+  - `NEXT_PUBLIC_API_BASE_URL`（若留空，前端預設使用同網域 `/api/*`）
 
 3. **部署**
    - Vercel 將自動構建並部署
+  - Framework Preset 使用 Next.js
+  - Root Directory 保持 `.`
+  - 不需要自訂 Build Command
    - 訪問您的 Vercel URL
 
 ### Google Apps Script 部署

@@ -17,7 +17,7 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
+      const baseURL = process.env.NEXT_PUBLIC_API_BASE_URL || '';
       const response = await axios.post(`${baseURL}/api/auth`, { password });
 
       if (response.data.ok && response.data.token) {

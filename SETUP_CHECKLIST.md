@@ -3,33 +3,32 @@
 ## ✅ 前端設置
 
 ### 檔案結構驗證
-- [x] `frontend/app/page.tsx` - 登錄頁面 ✓
-- [x] `frontend/app/layout.tsx` - 全域版面配置 ✓
-- [x] `frontend/app/globals.css` - 全域樣式 ✓
-- [x] `frontend/app/api/auth/route.ts` - 認證 API ✓
-- [x] `frontend/app/dashboard/page.tsx` - 儀表板主頁 ✓
-- [x] `frontend/app/dashboard/layout.tsx` - 儀表板版面配置 ✓
-- [x] `frontend/app/dashboard/entries/page.tsx` - 註冊列表頁面 ✓
-- [x] `frontend/app/dashboard/resend/page.tsx` - 重新寄送頁面 ✓
-- [x] `frontend/components/Sidebar.tsx` - 側邊導航欄 ✓
-- [x] `frontend/components/Header.tsx` - 頁面標題欄 ✓
-- [x] `frontend/lib/api-client.ts` - Axios API 用戶端 ✓
-- [x] `frontend/package.json` - 依賴宣告 ✓
-- [x] `frontend/tsconfig.json` - TypeScript 配置 ✓
-- [x] `frontend/tailwind.config.js` - Tailwind CSS 配置 ✓
-- [x] `frontend/next.config.js` - Next.js 配置 ✓
-- [x] `frontend/postcss.config.js` - PostCSS 配置 ✓
-- [x] `frontend/.env.example` - 環境變數範例 ✓
+- [x] `app/page.tsx` - 登錄頁面 ✓
+- [x] `app/layout.tsx` - 全域版面配置 ✓
+- [x] `app/globals.css` - 全域樣式 ✓
+- [x] `app/api/auth/route.ts` - 認證 API ✓
+- [x] `app/dashboard/page.tsx` - 儀表板主頁 ✓
+- [x] `app/dashboard/layout.tsx` - 儀表板版面配置 ✓
+- [x] `app/dashboard/entries/page.tsx` - 註冊列表頁面 ✓
+- [x] `app/dashboard/resend/page.tsx` - 重新寄送頁面 ✓
+- [x] `components/Sidebar.tsx` - 側邊導航欄 ✓
+- [x] `components/Header.tsx` - 頁面標題欄 ✓
+- [x] `lib/api-client.ts` - Axios API 用戶端 ✓
+- [x] `package.json` - 依賴宣告 ✓
+- [x] `tsconfig.json` - TypeScript 配置 ✓
+- [x] `tailwind.config.js` - Tailwind CSS 配置 ✓
+- [x] `next.config.js` - Next.js 配置 ✓
+- [x] `postcss.config.js` - PostCSS 配置 ✓
+- [x] `.env.example` - 環境變數範例 ✓
 
 ### 依賴安裝
 ```bash
-cd frontend
 npm install
 ```
 
-### 環境變數設置 (frontend/.env.local)
+### 環境變數設置 (.env.local)
 ```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000  # 或您的 Vercel URL
+NEXT_PUBLIC_API_BASE_URL=                       # 留空時使用同網域 /api/*
 ADMIN_PASSWORD=your-secure-password              # 必須設置
 JWT_SECRET=your-jwt-secret-key                   # 必須設置
 ```
@@ -37,12 +36,10 @@ JWT_SECRET=your-jwt-secret-key                   # 必須設置
 ### 本機開發測試
 ```bash
 # 終端 1 - 前端開發伺服器
-cd frontend
 npm run dev
 # 訪問 http://localhost:3000
 
 # 終端 2 - 後端測試
-cd ..
 # 測試 API 端點
 curl http://localhost:3000/api/stats
 ```
@@ -110,9 +107,9 @@ JWT_SECRET=your-jwt-secret-key
 BREVO_API_KEY=your-brevo-api-key
 ```
 
-**前端 (frontend/.env.local)**
+**前端 (.env.local)**
 ```
-NEXT_PUBLIC_API_BASE_URL=http://localhost:3000
+NEXT_PUBLIC_API_BASE_URL=
 ADMIN_PASSWORD=your-secure-password
 JWT_SECRET=your-jwt-secret-key
 ```
@@ -121,12 +118,11 @@ JWT_SECRET=your-jwt-secret-key
 
 ### 1. 安裝依賴
 ```bash
-npm run install-all
+npm install
 ```
 
 ### 2. 啟動前端開發伺服器
 ```bash
-cd frontend
 npm run dev
 ```
 
@@ -172,8 +168,10 @@ git push -u origin main
 1. 訪問 https://vercel.com
 2. 點擊 "New Project"
 3. 選擇您的 GitHub 倉庫
-4. 在項目設置中添加環境變數
-5. 點擊 "Deploy"
+4. Framework Preset 確認為 Next.js
+5. Root Directory 保持 `.`
+6. 在項目設置中添加環境變數
+7. 點擊 "Deploy"
 
 ### 3. 驗證部署
 - 訪問您的 Vercel URL

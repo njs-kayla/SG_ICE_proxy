@@ -4,8 +4,8 @@
 
 ### 一行指令安裝和啟動
 ```bash
-# 安裝所有依賴
-npm run install-all
+# 安裝依賴
+npm install
 
 # 啟動前端開發伺服器
 npm run dev
@@ -15,12 +15,12 @@ npm run dev
 
 | 功能 | 檔案路徑 |
 |------|---------|
-| 登錄頁面 | `frontend/app/page.tsx` |
-| 儀表板 | `frontend/app/dashboard/page.tsx` |
-| 註冊列表 | `frontend/app/dashboard/entries/page.tsx` |
-| 郵件重寄 | `frontend/app/dashboard/resend/page.tsx` |
-| 認證 API | `frontend/app/api/auth/route.ts` |
-| API 用戶端 | `frontend/lib/api-client.ts` |
+| 登錄頁面 | `app/page.tsx` |
+| 儀表板 | `app/dashboard/page.tsx` |
+| 註冊列表 | `app/dashboard/entries/page.tsx` |
+| 郵件重寄 | `app/dashboard/resend/page.tsx` |
+| 認證 API | `app/api/auth/route.ts` |
+| API 用戶端 | `lib/api-client.ts` |
 | Entries API | `api/entries.js` |
 | Resend API | `api/resend.js` |
 | Stats API | `api/stats.js` |
@@ -33,11 +33,11 @@ npm run dev
 
 | 變數名 | 說明 | 位置 |
 |--------|------|------|
-| `ADMIN_PASSWORD` | 管理員登錄密碼 | 前端 + Vercel |
-| `JWT_SECRET` | JWT 簽名密鑰 | 前端 + Vercel |
+| `ADMIN_PASSWORD` | 管理員登錄密碼 | 本機 .env.local + Vercel |
+| `JWT_SECRET` | JWT 簽名密鑰 | 本機 .env.local + Vercel |
 | `GAS_WEBAPP_URL` | Google Apps Script 部署網址 | Vercel |
 | `BREVO_API_KEY` | 郵件服務 API 密鑰 | Vercel |
-| `NEXT_PUBLIC_API_BASE_URL` | API 基礎 URL | 前端 |
+| `NEXT_PUBLIC_API_BASE_URL` | API 基礎 URL（可留空使用同網域） | 本機 .env.local |
 
 ## 🔧 API 端點速查
 
@@ -88,7 +88,7 @@ Authorization: Bearer {token}
 **檢查項目:**
 - [ ] ADMIN_PASSWORD 環境變數已設置
 - [ ] 密碼輸入正確
-- [ ] 前端 .env.local 已保存
+- [ ] 根目錄 .env.local 已保存
 - [ ] 開發伺服器已重啟
 
 **解決方案:**
@@ -221,7 +221,6 @@ localStorage.removeItem('token');
 **解決方案:**
 ```bash
 # 完全重新安裝
-cd frontend
 rm -rf node_modules package-lock.json
 npm install
 npm run dev
