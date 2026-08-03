@@ -182,7 +182,7 @@ function handleResendEmail_(sh, p) {
       const now = new Date();
 
       sh.getRange(rowNum, COLUMN_MAP.messageId, 1, 1).setValue(messageId);
-      sh.getRange(rowNum, COLUMN_MAP.status, 1, 1).setValue('Pending');
+      sh.getRange(rowNum, COLUMN_MAP.status, 1, 1).setValue('Sent');
       sh.getRange(rowNum, COLUMN_MAP.retry, 1, 1).setValue(retryCount);
       sh.getRange(rowNum, COLUMN_MAP.lastSendTime, 1, 1).setValue(now);
       sh.getRange(rowNum, COLUMN_MAP.lastError, 1, 1).setValue('');
@@ -357,7 +357,7 @@ function handleFormSubmit_(sh, p) {
       raffle_code,
 
       messageId,
-      "Pending",
+      "Sent",
       0,
       createdAt,
       ""

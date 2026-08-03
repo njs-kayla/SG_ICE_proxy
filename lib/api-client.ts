@@ -22,6 +22,8 @@ interface EntriesResponse extends ApiResponse<void> {
   rows: any[];
 }
 
+type EntryRecord = EntriesResponse['rows'][number];
+
 interface StatsResponse extends ApiResponse<void> {
   total: number;
   success: number;
@@ -71,6 +73,29 @@ class ApiClient {
     } catch (error: any) {
       throw new Error(error.response?.data?.msg || 'Failed to fetch entries');
     }
+  }
+
+  async getAllEntries(options: Omit<GetEntriesOptions, 'page' | 'pageSize'> = {}): Promise<EntryRecord[]> {
+    const pageSize = 1000;
+    const firstPage = await this.getEntries({
+      ...options,
+      page: 1,
+      pageSize,
+    });
+
+    const allRows = [...firstPage.rows];
+    const totalPages = Math.ceil(firstPage.total / pageSize);
+
+    for (let page = 2; page <= totalPages; page += 1) {
+      const nextPage = await this.getEntries({
+        ...options,
+        page,
+        pageSize,
+      });
+      allRows.push(...nextPage.rows);
+    }
+
+    return allRows;
   }
 
   async resendEmail(row: number): Promise<ResendResponse> {

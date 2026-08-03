@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { LogOut, Menu } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 export default function Header() {
   const router = useRouter();
