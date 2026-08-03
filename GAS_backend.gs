@@ -270,7 +270,7 @@ function handleExportCsv_(sh, p) {
       }).join(',')
     );
 
-    const csv = csvLines.join('\n');
+      const csv = csvLines.join('\r\n');
     return csvText(csv);
   } catch (err) {
     return json({ ok: false, msg: safeMsg_(err) });
@@ -438,7 +438,7 @@ function json(obj) {
 
 function csvText(text) {
   return ContentService
-    .createTextOutput(text)
+     .createTextOutput('\uFEFF' + text)
     .setMimeType(ContentService.MimeType.CSV);
 }
 

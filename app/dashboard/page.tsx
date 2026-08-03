@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { RefreshCw, Download, Copy, Check, Send, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { RefreshCw, Download, Copy, Check, Send, Search, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 import { apiClient } from '@/lib/api-client';
 import { isMockMode } from '@/lib/mock-data';
 
@@ -351,33 +351,45 @@ export default function DashboardPage() {
               </form>
 
               <div className="flex gap-2">
-                <select
-                  value={statusFilter}
-                  onChange={(event) => {
-                    setPage(1);
-                    setStatusFilter(event.target.value);
-                  }}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="">All Status</option>
-                  <option value="Sent">Delivered</option>
-                  <option value="Pending">Pending</option>
-                  <option value="Failed">Failed</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={statusFilter}
+                    onChange={(event) => {
+                      setPage(1);
+                      setStatusFilter(event.target.value);
+                    }}
+                    className="appearance-none rounded-lg border border-gray-300 py-2 pl-3 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">All Status</option>
+                    <option value="Sent">Delivered</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Failed">Failed</option>
+                  </select>
+                  <ChevronDown
+                    size={16}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+                </div>
 
-                <select
-                  value={pageSize}
-                  onChange={(event) => {
-                    setPage(1);
-                    setPageSize(Number(event.target.value));
-                  }}
-                  className="rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="10">10 / page</option>
-                  <option value="20">20 / page</option>
-                  <option value="50">50 / page</option>
-                  <option value="100">100 / page</option>
-                </select>
+                <div className="relative">
+                  <select
+                    value={pageSize}
+                    onChange={(event) => {
+                      setPage(1);
+                      setPageSize(Number(event.target.value));
+                    }}
+                    className="appearance-none rounded-lg border border-gray-300 py-2 pl-3 pr-9 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="10">10 / page</option>
+                    <option value="20">20 / page</option>
+                    <option value="50">50 / page</option>
+                    <option value="100">100 / page</option>
+                  </select>
+                  <ChevronDown
+                    size={16}
+                    className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+                  />
+                </div>
               </div>
             </div>
           </div>

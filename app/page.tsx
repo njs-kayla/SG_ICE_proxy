@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Lock, AlertCircle } from 'lucide-react';
 import axios from 'axios';
 import { getMockToken, isMockMode } from '@/lib/mock-data';
+import Logo from './dark.png';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -42,15 +43,14 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-600 to-blue-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Logo/Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-2xl mb-4">
-            <Lock className="text-blue-600" size={32} />
+          <div className="inline-flex items-center justify-center mb-4">
+            <img src={Logo.src} className='w-72' alt="Logo"/>
           </div>
-          <h1 className="text-3xl font-bold text-white mb-2">SBC 2026</h1>
-          <p className="text-blue-100">Admin Panel</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">SBC 2026</h1>
         </div>
 
         {/* Login Card */}
@@ -119,7 +119,7 @@ export default function LoginPage() {
         </div>
 
         {/* Security Notice */}
-        <p className="text-center text-blue-100 text-xs mt-6">
+        <p className="text-center text-gray-800 text-xs mt-6">
           🔒 This is a secure area. Only authorized personnel should access.
         </p>
       </div>
