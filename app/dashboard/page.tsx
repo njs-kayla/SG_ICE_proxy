@@ -16,21 +16,17 @@ import {
   Download,
   Copy,
   Check,
-  Send,
-  Search,
-  ChevronLeft,
-  ChevronRight,
   ChevronDown,
 } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { isMockMode } from "@/lib/mock-data";
+import { useDashboardHeaderActions } from "../../components/dashboard-header-actions-context";
 
 interface Stats {
   total: number;
   success: number;
   pending: number;
   failed: number;
-  retry: number;
 }
 
 interface Entry {
@@ -41,8 +37,6 @@ interface Entry {
   company: string;
   raffleCode: string;
   status: string;
-  retry: number;
-  lastError: string;
 }
 
 interface DailyDatum {
@@ -82,6 +76,7 @@ function formatTimestamp(value: string) {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
+    year: "numeric",
     minute: "2-digit",
     hour12: false,
   });
@@ -113,6 +108,7 @@ function getStatusLabel(status: string) {
 
 export default function DashboardPage() {
   const mockMode = isMockMode();
+  const { setActions } = useDashboardHeaderActions();
   const [stats, setStats] = useState<Stats | null>(null);
   const [entries, setEntries] = useState<Entry[]>([]);
   const [loading, setLoading] = useState(true);
@@ -189,6 +185,32 @@ export default function DashboardPage() {
     return () => clearInterval(interval);
   }, []);
 
+  useEffect(() => {
+    setActions(
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <span className="text-sm text-gray-500">Last updated {lastUpdated}</span>
+        <button
+          onClick={fetchSummaryData}
+          disabled={loading}
+          className="flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-60"
+          title="Refresh"
+        >
+          <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
+          Refresh
+        </button>
+        <button
+          onClick={() => apiClient.exportCsv()}
+          className="flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-white transition hover:bg-blue-700"
+        >
+          <Download size={18} />
+          <span className="text-sm">Export CSV</span>
+        </button>
+      </div>,
+    );
+
+    return () => setActions(null);
+  }, [lastUpdated, loading, setActions]);
+
   const handleCopyTodays = () => {
     if (!activeDayCodes) {
       return;
@@ -206,31 +228,6 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header Section */}
-      <div className="flex justify-end items-start">
-        <div className="flex gap-2 items-center">
-          <span className="text-sm text-gray-500">
-            Last updated {lastUpdated}
-          </span>
-          <button
-            onClick={fetchSummaryData}
-            disabled={loading}
-            className="px-3 py-2 hover:bg-gray-100 rounded-lg transition flex gap-2 items-center text-sm font-medium text-gray-700"
-            title="Refresh"
-          >
-            <RefreshCw size={20} className={loading ? "animate-spin" : ""} />
-            Refresh
-          </button>
-          <button
-            onClick={() => apiClient.exportCsv()}
-            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex gap-2 items-center transition"
-          >
-            <Download size={18} />
-            Export CSV
-          </button>
-        </div>
-      </div>
-
       {message && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
           {message}
@@ -343,7 +340,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                <button
+                { dateFilter && (
+                  <button
                   onClick={handleCopyTodays}
                   disabled={!activeDayCodes}
                   className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg flex gap-2 items-center transition"
@@ -354,6 +352,7 @@ export default function DashboardPage() {
                     {tableEntries.length}
                   </span>
                 </button>
+                )}
               </div>
             </div>
           </div>
@@ -363,7 +362,7 @@ export default function DashboardPage() {
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-200">
               <tr>
-                <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                <th className="w-40 whitespace-nowrap px-4 py-3 text-left font-semibold text-gray-700">
                   TIME
                 </th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">
@@ -378,7 +377,7 @@ export default function DashboardPage() {
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">
                   CODE
                 </th>
-                <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                <th className="w-40 whitespace-nowrap px-4 py-3 text-right font-semibold text-gray-700">
                   EMAIL STATUS
                 </th>
               </tr>
@@ -405,7 +404,7 @@ export default function DashboardPage() {
               ) : (
                 tableEntries.map((entry) => (
                   <tr key={entry.row} className="hover:bg-gray-50 transition">
-                    <td className="px-6 py-4 text-gray-600 font-medium">
+                    <td className="whitespace-nowrap px-4 py-4 text-gray-600 font-medium">
                       {formatTimestamp(entry.createdAt)}
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900">
@@ -418,26 +417,16 @@ export default function DashboardPage() {
                       {entry.company || "-"}
                     </td>
                     <td className="px-6 py-4">
-                      <code className="px-3 py-1 bg-gray-100 text-gray-700 rounded font-mono font-medium">
+                      <code className="px-3 py-1 font-bold bg-gray-100 text-gray-700 rounded">
                         {entry.raffleCode}
                       </code>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="space-y-1">
-                        <span
-                          className={`px-3 py-1 rounded-full font-medium ${getStatusClasses(entry.status)}`}
-                        >
-                          {getStatusLabel(entry.status)}
-                        </span>
-                        {entry.lastError ? (
-                          <p
-                            className="font-medium text-red-600 max-w-xs p-1 truncate"
-                            title={entry.lastError}
-                          >
-                            {entry.lastError}
-                          </p>
-                        ) : null}
-                      </div>
+                    <td className="px-4 py-4 text-right">
+                      <span
+                        className={`px-3 py-1 rounded-full font-medium ${getStatusClasses(entry.status)}`}
+                      >
+                        {getStatusLabel(entry.status)}
+                      </span>
                     </td>
                   </tr>
                 ))

@@ -13,8 +13,7 @@ import { callGAS } from "../lib/gas-request.js";
  *     "total": 512,
  *     "success": 480,
  *     "pending": 20,
- *     "failed": 12,
- *     "retry": 8
+ *     "failed": 12
  *   }
  */
 export default async function handler(req, res) {
@@ -59,7 +58,6 @@ export default async function handler(req, res) {
       success: gasData.success || 0,
       pending: gasData.pending || 0,
       failed: gasData.failed || 0,
-      retry: gasData.retry || 0,
     });
 
     return respondJson(res, response);

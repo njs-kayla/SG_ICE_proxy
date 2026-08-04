@@ -7,7 +7,6 @@ import {
   getMockEntries,
   getMockStats,
   isMockMode,
-  resendMockEmail,
 } from "./mock-data";
 
 interface GetEntriesOptions {
@@ -37,11 +36,6 @@ interface StatsResponse extends ApiResponse<void> {
   success: number;
   pending: number;
   failed: number;
-  retry: number;
-}
-
-interface ResendResponse extends ApiResponse<void> {
-  messageId?: string;
 }
 
 class ApiClient {
@@ -114,21 +108,6 @@ class ApiClient {
     }
 
     return allRows;
-  }
-
-  async resendEmail(row: number): Promise<ResendResponse> {
-    if (isMockMode()) {
-      return resendMockEmail(row);
-    }
-
-    try {
-      const { data } = await this.client.post<ResendResponse>("/api/resend", {
-        row,
-      });
-      return data;
-    } catch (error: any) {
-      throw new Error(error.response?.data?.msg || "Failed to resend email");
-    }
   }
 
   async getStats(): Promise<StatsResponse> {

@@ -18,11 +18,9 @@ npm run dev
 | 登錄頁面 | `app/page.tsx` |
 | 儀表板 | `app/dashboard/page.tsx` |
 | 註冊列表 | `app/dashboard/entries/page.tsx` |
-| 郵件重寄 | `app/dashboard/resend/page.tsx` |
 | 認證 API | `app/api/auth/route.ts` |
 | API 用戶端 | `lib/api-client.ts` |
 | Entries API | `api/entries.js` |
-| Resend API | `api/resend.js` |
 | Stats API | `api/stats.js` |
 | Export API | `api/export.js` |
 | GAS 後端 | `GAS_backend.gs` |
@@ -55,15 +53,6 @@ GET /api/entries?page=1&pageSize=20&keyword=john&status=Sent
 Authorization: Bearer {token}
 ```
 回應: `{ok: true, total: 100, rows: [...]}`
-
-### 重新寄送
-```bash
-POST /api/resend
-Authorization: Bearer {token}
-Content-Type: application/json
-{"row": 5}
-```
-回應: `{ok: true, messageId: "..."}`
 
 ### 統計資料
 ```bash

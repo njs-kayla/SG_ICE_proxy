@@ -131,22 +131,6 @@ GET /api/entries?page=1&pageSize=20&keyword=john&status=Sent
 }
 ```
 
-### 重新寄送郵件
-```
-POST /api/resend
-Content-Type: application/json
-
-{
-  "row": 5
-}
-
-回應:
-{
-  "ok": true,
-  "messageId": "abc123..."
-}
-```
-
 ### 獲取統計資料
 ```
 GET /api/stats
@@ -157,8 +141,7 @@ GET /api/stats
   "total": 100,
   "success": 95,
   "pending": 3,
-  "failed": 2,
-  "retry": 1
+  "failed": 2
 }
 ```
 

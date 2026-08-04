@@ -31,11 +31,7 @@ import { filterAndPaginate } from "../lib/data-filters.js";
  *         "phone": "",
  *         "message": "",
  *         "raffleCode": "",
- *         "messageId": "",
- *         "status": "Pending",
- *         "retry": 0,
- *         "lastSendTime": "",
- *         "lastError": ""
+ *         "status": "Pending"
  *       }
  *     ]
  *   }

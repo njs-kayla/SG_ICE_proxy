@@ -55,10 +55,6 @@ export default function LoginPage() {
 
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome</h2>
-          </div>
-
           {mockMode && (
             <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
               Local preview mode is using fake participant data and bypassing API authentication.

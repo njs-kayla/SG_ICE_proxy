@@ -10,7 +10,6 @@
 - [x] `app/dashboard/page.tsx` - 儀表板主頁 ✓
 - [x] `app/dashboard/layout.tsx` - 儀表板版面配置 ✓
 - [x] `app/dashboard/entries/page.tsx` - 註冊列表頁面 ✓
-- [x] `app/dashboard/resend/page.tsx` - 重新寄送頁面 ✓
 - [x] `components/Sidebar.tsx` - 側邊導航欄 ✓
 - [x] `components/Header.tsx` - 頁面標題欄 ✓
 - [x] `lib/api-client.ts` - Axios API 用戶端 ✓
@@ -49,7 +48,6 @@ curl http://localhost:3000/api/stats
 ### Vercel API 結構
 - [x] `api/submit.js` - 表單提交 (已存在) ✓
 - [x] `api/entries.js` - 獲取註冊列表 ✓
-- [x] `api/resend.js` - 重新寄送郵件 ✓
 - [x] `api/stats.js` - 獲取統計資料 ✓
 - [x] `api/export.js` - 匯出 CSV ✓
 
@@ -69,7 +67,6 @@ curl http://localhost:3000/api/stats
 - [x] `GAS_backend.gs` - 完整後端 (500+ 行) ✓
   - [x] `doPost(e)` - 主入口
   - [x] `handleGetEntries_()` - 獲取列表
-  - [x] `handleResendEmail_()` - 重新寄送
   - [x] `handleGetStats_()` - 統計資料
   - [x] `handleExportCsv_()` - CSV 匯出
   - [x] `handleFormSubmit_()` - 表單提交

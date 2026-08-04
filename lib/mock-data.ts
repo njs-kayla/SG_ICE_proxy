@@ -16,11 +16,7 @@ export interface MockEntry {
   phone: string;
   message: string;
   raffleCode: string;
-  messageId: string;
   status: string;
-  retry: number;
-  lastSendTime: string;
-  lastError: string;
 }
 
 interface MockStats {
@@ -28,7 +24,6 @@ interface MockStats {
   success: number;
   pending: number;
   failed: number;
-  retry: number;
 }
 
 const MOCK_TOKEN = 'mock-local-token';
@@ -43,11 +38,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-001',
     message: 'Looking forward to the lucky draw event.',
     raffleCode: 'SBC-X7K2M9',
-    messageId: 'mock-msg-101',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-10-01T14:33:12+08:00',
-    lastError: '',
   },
   {
     row: 102,
@@ -58,11 +49,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-002',
     message: 'Need booth information.',
     raffleCode: 'SBC-Q4T8B2',
-    messageId: 'mock-msg-102',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-10-01T14:06:18+08:00',
-    lastError: '',
   },
   {
     row: 103,
@@ -71,13 +58,9 @@ const initialEntries: MockEntry[] = [
     email: 'kevin.lin@bigdata.tw',
     company: 'Big Data TW',
     phone: '0912-001-003',
-    message: 'Please resend the event code.',
+    message: 'Please share the event code again at the booth.',
     raffleCode: 'SBC-M2N6P4',
-    messageId: '',
     status: 'Failed',
-    retry: 2,
-    lastSendTime: '2026-10-01T13:48:03+08:00',
-    lastError: 'SMTP timeout from provider',
   },
   {
     row: 104,
@@ -88,11 +71,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-004',
     message: 'Will arrive after lunch.',
     raffleCode: 'SBC-J9R3W7',
-    messageId: 'mock-msg-104',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-10-01T13:31:10+08:00',
-    lastError: '',
   },
   {
     row: 105,
@@ -103,11 +82,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-005',
     message: 'Interested in partner program.',
     raffleCode: 'SBC-F5H8K1',
-    messageId: 'mock-msg-105',
     status: 'Sent',
-    retry: 1,
-    lastSendTime: '2026-10-01T13:14:21+08:00',
-    lastError: '',
   },
   {
     row: 106,
@@ -118,11 +93,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-006',
     message: 'Will bring team members.',
     raffleCode: 'SBC-N8D2Q5',
-    messageId: '',
     status: 'Pending',
-    retry: 0,
-    lastSendTime: '',
-    lastError: '',
   },
   {
     row: 107,
@@ -133,11 +104,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-007',
     message: 'Interested in speaking slots.',
     raffleCode: 'SBC-R6P4L3',
-    messageId: 'mock-msg-107',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-10-01T12:41:22+08:00',
-    lastError: '',
   },
   {
     row: 108,
@@ -148,11 +115,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-008',
     message: 'Need invoice details.',
     raffleCode: 'SBC-T3Z7Y1',
-    messageId: 'mock-msg-108',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-10-01T11:56:34+08:00',
-    lastError: '',
   },
   {
     row: 109,
@@ -163,11 +126,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-009',
     message: 'Follow up on sponsorship.',
     raffleCode: 'SBC-C4V6N8',
-    messageId: 'mock-msg-109',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-09-30T16:22:42+08:00',
-    lastError: '',
   },
   {
     row: 110,
@@ -178,11 +137,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-010',
     message: 'Would like parking information.',
     raffleCode: 'SBC-U2M5A9',
-    messageId: 'mock-msg-110',
     status: 'Sent',
-    retry: 1,
-    lastSendTime: '2026-09-30T15:45:28+08:00',
-    lastError: '',
   },
   {
     row: 111,
@@ -193,11 +148,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-011',
     message: 'Need NDA before meeting.',
     raffleCode: 'SBC-B8L1E4',
-    messageId: '',
     status: 'Failed',
-    retry: 1,
-    lastSendTime: '2026-09-30T15:11:31+08:00',
-    lastError: 'Mailbox unavailable',
   },
   {
     row: 112,
@@ -208,11 +159,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-012',
     message: 'Can join the networking session.',
     raffleCode: 'SBC-W5Q8S2',
-    messageId: 'mock-msg-112',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-09-30T14:37:48+08:00',
-    lastError: '',
   },
   {
     row: 113,
@@ -223,11 +170,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-013',
     message: 'Requesting interpreter support.',
     raffleCode: 'SBC-H6J4P2',
-    messageId: '',
     status: 'Pending',
-    retry: 0,
-    lastSendTime: '',
-    lastError: '',
   },
   {
     row: 114,
@@ -238,11 +181,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-014',
     message: 'Will attend with CTO.',
     raffleCode: 'SBC-K7D9F5',
-    messageId: 'mock-msg-114',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-09-30T13:15:17+08:00',
-    lastError: '',
   },
   {
     row: 115,
@@ -253,11 +192,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-015',
     message: 'Requesting onsite interview.',
     raffleCode: 'SBC-G3M8X6',
-    messageId: 'mock-msg-115',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-09-29T16:49:56+08:00',
-    lastError: '',
   },
   {
     row: 116,
@@ -268,11 +203,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-016',
     message: 'Checking exhibitor access.',
     raffleCode: 'SBC-Y1T6R8',
-    messageId: 'mock-msg-116',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-09-29T16:05:42+08:00',
-    lastError: '',
   },
   {
     row: 117,
@@ -283,11 +214,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-017',
     message: 'Need badge correction.',
     raffleCode: 'SBC-L9C2D7',
-    messageId: '',
     status: 'Failed',
-    retry: 3,
-    lastSendTime: '2026-09-29T15:24:08+08:00',
-    lastError: 'Recipient server rejected message',
   },
   {
     row: 118,
@@ -298,11 +225,7 @@ const initialEntries: MockEntry[] = [
     phone: '0912-001-018',
     message: 'Would like product deck.',
     raffleCode: 'SBC-P4N7K3',
-    messageId: 'mock-msg-118',
     status: 'Sent',
-    retry: 0,
-    lastSendTime: '2026-09-29T14:59:33+08:00',
-    lastError: '',
   },
 ];
 
@@ -374,34 +297,11 @@ export function getMockStats(): MockStats {
     success: entries.filter((entry) => entry.status === 'Sent').length,
     pending: entries.filter((entry) => entry.status === 'Pending').length,
     failed: entries.filter((entry) => entry.status === 'Failed').length,
-    retry: entries.reduce((sum, entry) => sum + entry.retry, 0),
-  };
-}
-
-export function resendMockEmail(row: number) {
-  mockEntries = mockEntries.map((entry) => {
-    if (entry.row !== row) {
-      return entry;
-    }
-
-    return {
-      ...entry,
-      status: 'Sent',
-      retry: entry.retry + 1,
-      messageId: entry.messageId || `mock-msg-${row}`,
-      lastSendTime: new Date().toISOString(),
-      lastError: '',
-    };
-  });
-
-  return {
-    ok: true,
-    messageId: `mock-msg-${row}`,
   };
 }
 
 export function exportMockCsv() {
-  const headers = ['Created At', 'Name', 'Email', 'Company', 'Phone', 'Message', 'Raffle Code', 'Status', 'Retry', 'Last Error'];
+  const headers = ['Created At', 'Name', 'Email', 'Company', 'Phone', 'Message', 'Raffle Code', 'Status'];
   const lines = sortEntries(mockEntries).map((entry) => [
     entry.createdAt,
     entry.name,
@@ -411,8 +311,6 @@ export function exportMockCsv() {
     entry.message,
     entry.raffleCode,
     entry.status,
-    String(entry.retry),
-    entry.lastError,
   ]);
 
   return [headers, ...lines]

@@ -25,9 +25,11 @@ const HEADER = [
   'Contact Number',
   'Message',
   'Raffle Code',
+  'Email Status'
+];
 
+const LEGACY_REMOVED_HEADERS = [
   'Message ID',
-  'Email Status',
   'Retry Count',
   'Last Send Time',
   'Last Error'
@@ -45,11 +47,7 @@ const COLUMN_MAP = {
   phone: 5,
   message: 6,
   raffleCode: 7,
-  messageId: 8,
-  status: 9,
-  retry: 10,
-  lastSendTime: 11,
-  lastError: 12
+  status: 8
 };
 
 
@@ -68,9 +66,6 @@ function doPost(e) {
   // ✅ 路由到對應的 action handler
   if (action === 'getEntries') {
     return handleGetEntries_(sh, p);
-  }
-  if (action === 'resendEmail') {
-    return handleResendEmail_(sh, p);
   }
   if (action === 'getStats') {
     return handleGetStats_(sh, p);
@@ -112,85 +107,10 @@ function handleGetEntries_(sh, p) {
       phone: String(row[COLUMN_MAP.phone - 1] || '').trim(),
       message: String(row[COLUMN_MAP.message - 1] || '').trim(),
       raffleCode: String(row[COLUMN_MAP.raffleCode - 1] || '').trim(),
-      messageId: String(row[COLUMN_MAP.messageId - 1] || '').trim(),
-      status: String(row[COLUMN_MAP.status - 1] || 'Pending').trim(),
-      retry: parseInt(row[COLUMN_MAP.retry - 1] || 0, 10),
-      lastSendTime: formatDate_(row[COLUMN_MAP.lastSendTime - 1]),
-      lastError: String(row[COLUMN_MAP.lastError - 1] || '').trim()
+      status: String(row[COLUMN_MAP.status - 1] || 'Pending').trim()
     }));
 
     return json({ ok: true, rows });
-  } catch (err) {
-    return json({ ok: false, msg: safeMsg_(err) });
-  }
-}
-
-/**
- * 重新寄送 Email
- */
-function handleResendEmail_(sh, p) {
-  try {
-    const rowNum = parseInt(p.row, 10);
-    if (!rowNum || rowNum < 2) {
-      return json({ ok: false, msg: 'invalid row number' });
-    }
-
-    const lock = LockService.getScriptLock();
-    lock.waitLock(10000);
-
-    try {
-      // ✅ 讀取該行資料
-      const row = sh.getRange(rowNum, 1, 1, HEADER.length).getValues()[0];
-      if (!row) {
-        return json({ ok: false, msg: 'row not found' });
-      }
-
-      const email = String(row[COLUMN_MAP.email - 1] || '').trim();
-      const name = String(row[COLUMN_MAP.name - 1] || '').trim();
-      const raffleCode = String(row[COLUMN_MAP.raffleCode - 1] || '').trim();
-
-      if (!email || !raffleCode) {
-        return json({ ok: false, msg: 'missing email or raffle code in row' });
-      }
-
-      // ✅ 寄送 Email
-      const htmlBody = buildEmailHtml_(raffleCode);
-      const plainBody = buildEmailText_(raffleCode);
-
-      const mailResult = sendBrevoEmail_({
-        toEmail: email,
-        toName: name,
-        subject: EMAIL_SUBJECT,
-        htmlContent: htmlBody,
-        textContent: plainBody,
-      });
-
-      if (!mailResult.ok) {
-        // ✅ 更新 Last Error
-        const retryCount = parseInt(row[COLUMN_MAP.retry - 1] || 0, 10) + 1;
-        const now = new Date();
-        sh.getRange(rowNum, COLUMN_MAP.retry, 1, 1).setValue(retryCount);
-        sh.getRange(rowNum, COLUMN_MAP.lastError, 1, 1).setValue(mailResult.error);
-        sh.getRange(rowNum, COLUMN_MAP.lastSendTime, 1, 1).setValue(now);
-
-        return json({ ok: false, msg: `email send failed: ${mailResult.error}` });
-      }
-
-      // ✅ 成功：更新 messageId、status、retry、lastSendTime
-      const messageId = mailResult.messageId || '';
-      const retryCount = parseInt(row[COLUMN_MAP.retry - 1] || 0, 10) + 1;
-      const now = new Date();
-
-      sh.getRange(rowNum, COLUMN_MAP.messageId, 1, 1).setValue(messageId);
-      sh.getRange(rowNum, COLUMN_MAP.status, 1, 1).setValue('Sent');
-      sh.getRange(rowNum, COLUMN_MAP.retry, 1, 1).setValue(retryCount);
-      sh.getRange(rowNum, COLUMN_MAP.lastSendTime, 1, 1).setValue(now);
-      sh.getRange(rowNum, COLUMN_MAP.lastError, 1, 1).setValue('');
-
-      return json({ ok: true, messageId });
-    } finally {
-      lock.releaseLock();
-    }
   } catch (err) {
     return json({ ok: false, msg: safeMsg_(err) });
   }
@@ -208,28 +128,22 @@ function handleGetStats_(sh, p) {
         total: 0,
         success: 0,
         pending: 0,
-        failed: 0,
-        retry: 0
+        failed: 0
       });
     }
 
     const data = sh.getRange(2, COLUMN_MAP.status, lastRow - 1, 1).getValues();
-    const retryData = sh.getRange(2, COLUMN_MAP.retry, lastRow - 1, 1).getValues();
 
     let success = 0;
     let pending = 0;
     let failed = 0;
-    let retry = 0;
 
     for (let i = 0; i < data.length; i++) {
       const status = String(data[i][0] || 'Pending').trim();
-      const retryCount = parseInt(retryData[i][0] || 0, 10);
 
       if (status === 'Sent') success++;
       else if (status === 'Failed') failed++;
       else if (status === 'Pending') pending++;
-
-      if (retryCount > 0) retry++;
     }
 
     return json({
@@ -237,8 +151,7 @@ function handleGetStats_(sh, p) {
       total: data.length,
       success,
       pending,
-      failed,
-      retry
+      failed
     });
   } catch (err) {
     return json({ ok: false, msg: safeMsg_(err) });
@@ -342,8 +255,6 @@ function handleFormSubmit_(sh, p) {
       });
     }
 
-    const messageId = mailResult.messageId || "";
-
     // ✅ 寄信成功才寫入
     const createdAt = new Date();
     const phoneText = phone ? "'" + phone : "";
@@ -355,12 +266,7 @@ function handleFormSubmit_(sh, p) {
       phoneText,
       message,
       raffle_code,
-
-      messageId,
-      "Sent",
-      0,
-      createdAt,
-      ""
+      "Sent"
     ]);
 
     return json({ ok: true, existed: false, msg: 'saved and emailed' });
@@ -410,8 +316,7 @@ function sendBrevoEmail_({ toEmail, toName, subject, htmlContent, textContent })
   } catch (_) { }
 
   if (code >= 200 && code < 300) {
-    // 成功時 body 通常會有 messageId
-    return { ok: true, messageId: body && body.messageId ? body.messageId : '' };
+    return { ok: true };
   }
 
   // 失敗：Brevo 常見會回傳 message / code
@@ -474,11 +379,27 @@ function ensureHeader_(sh) {
   }
 
   // ✅ 如果第一列是空的，也補上 header
-  const firstRow = sh.getRange(1, 1, 1, Math.max(sh.getLastColumn(), HEADER.length)).getValues()[0];
+  const lastColumn = Math.max(sh.getLastColumn(), HEADER.length);
+  const firstRow = sh.getRange(1, 1, 1, lastColumn).getValues()[0];
   const hasAny = firstRow.some(v => String(v || '').trim() !== '');
   if (!hasAny) {
     sh.getRange(1, 1, 1, HEADER.length).setValues([HEADER]);
+    return;
   }
+
+  const legacyColumnsToDelete = [];
+  for (let i = firstRow.length - 1; i >= 0; i--) {
+    const headerValue = String(firstRow[i] || '').trim();
+    if (LEGACY_REMOVED_HEADERS.includes(headerValue)) {
+      legacyColumnsToDelete.push(i + 1);
+    }
+  }
+
+  legacyColumnsToDelete.forEach((columnIndex) => {
+    sh.deleteColumn(columnIndex);
+  });
+
+  sh.getRange(1, 1, 1, HEADER.length).setValues([HEADER]);
 }
 
 function isEmailExists_(sh, emailKey) {

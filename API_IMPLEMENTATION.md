@@ -19,7 +19,6 @@ SG_ICE_proxy/
 ├── api/
 │   ├── submit.js          (原有，未修改)
 │   ├── entries.js         ✨ 新增 - GET /api/entries
-│   ├── resend.js          ✨ 新增 - POST /api/resend
 │   ├── stats.js           ✨ 新增 - GET /api/stats
 │   └── export.js          ✨ 新增 - GET /api/export
 ├── lib/
@@ -127,11 +126,7 @@ GAS 應返回：`{ ok: true, rows: [...] }`
       "phone": "0912345678",
       "message": "Hello ICE",
       "raffleCode": "RAFFLE123",
-      "messageId": "msg-12345",
-      "status": "Pending",
-      "retry": 0,
-      "lastSendTime": "",
-      "lastError": ""
+      "status": "Pending"
     }
   ]
 }
@@ -147,49 +142,7 @@ GAS 應返回：`{ ok: true, rows: [...] }`
 
 ---
 
-#### 2️⃣ POST `/api/resend`
-
-**功能**：重新寄送 Email 給指定行的記錄
-
-**請求體** (JSON 或 form-encoded):
-```json
-{
-  "row": 15
-}
-```
-
-**GAS 呼叫**：
-```
-action=resendEmail&row=15
-```
-GAS 應返回：`{ ok: true, messageId: "..." }` 或錯誤回應
-
-GAS 應自動更新該行：
-- Message ID
-- Email Status
-- Retry Count +1
-- Last Send Time
-- Last Error
-
-**成功回應** (200):
-```json
-{
-  "ok": true,
-  "messageId": "msg-67890"
-}
-```
-
-**錯誤回應** (400/500/502):
-```json
-{
-  "ok": false,
-  "msg": "Missing required parameter: row"
-}
-```
-
----
-
-#### 3️⃣ GET `/api/stats`
+#### 2️⃣ GET `/api/stats`
 
 **功能**：提供 Dashboard 統計資訊
 
@@ -204,8 +157,7 @@ GAS 應返回：
   "total": 512,
   "success": 480,
   "pending": 20,
-  "failed": 12,
-  "retry": 8
+  "failed": 12
 }
 ```
 
@@ -216,8 +168,7 @@ GAS 應返回：
   "total": 512,
   "success": 480,
   "pending": 20,
-  "failed": 12,
-  "retry": 8
+  "failed": 12
 }
 ```
 
@@ -231,7 +182,7 @@ GAS 應返回：
 
 ---
 
-#### 4️⃣ GET `/api/export`
+#### 3️⃣ GET `/api/export`
 
 **功能**：匯出所有報名資料為 CSV 檔案
 
@@ -249,9 +200,9 @@ Content-Disposition: attachment; filename="export.csv"
 
 **成功回應** (200) - CSV 文本:
 ```csv
-row,createdAt,name,email,company,phone,message,raffleCode,messageId,status,retry,lastSendTime,lastError
-2,2024-08-01,John Doe,john@example.com,ABC Corp,0912345678,Hello ICE,RAFFLE123,msg-12345,Pending,0,,
-3,2024-08-02,Jane Smith,jane@example.com,XYZ Ltd,0987654321,Interested,RAFFLE456,msg-12346,Sent,1,2024-08-02 10:30,
+row,createdAt,name,email,company,phone,message,raffleCode,status
+2,2024-08-01,John Doe,john@example.com,ABC Corp,0912345678,Hello ICE,RAFFLE123,Pending
+3,2024-08-02,Jane Smith,jane@example.com,XYZ Ltd,0987654321,Interested,RAFFLE456,Sent
 ```
 
 **錯誤回應** (500/502):
@@ -307,38 +258,21 @@ curl "http://localhost:3000/api/entries?keyword=john&status=Pending&page=1&pageS
 # 應返回同時符合搜尋和篩選條件的記錄
 ```
 
-**6. 重新寄送 Email (JSON)**
-```bash
-curl -X POST http://localhost:3000/api/resend \
-  -H "Content-Type: application/json" \
-  -d '{"row":15}'
-
-# 應返回 { ok: true, messageId: "..." }
-```
-
-**7. 重新寄送 Email (Form-encoded)**
-```bash
-curl -X POST http://localhost:3000/api/resend \
-  -d "row=15"
-
-# 應返回同樣結果
-```
-
-**8. 統計資訊**
+**6. 統計資訊**
 ```bash
 curl "http://localhost:3000/api/stats"
 
-# 應返回 { ok: true, total, success, pending, failed, retry }
+# 應返回 { ok: true, total, success, pending, failed }
 ```
 
-**9. CSV 匯出**
+**7. CSV 匯出**
 ```bash
 curl "http://localhost:3000/api/export" > export.csv
 
 # 應生成 CSV 檔案
 ```
 
-**10. 缺少環境變數**
+**8. 缺少環境變數**
 ```bash
 # 不設定 GAS_WEBAPP_URL，任意呼叫 API
 curl "http://localhost:3000/api/entries"
@@ -346,13 +280,13 @@ curl "http://localhost:3000/api/entries"
 # 應返回 500: { ok: false, msg: "Missing GAS_WEBAPP_URL" }
 ```
 
-**11. GAS 返回非 JSON**
+**9. GAS 返回非 JSON**
 ```bash
 # 模擬 GAS 返回非 JSON 內容
 # 應返回 502: { ok: false, msg: "GAS returned non-JSON: ..." }
 ```
 
-**12. 無效查詢參數**
+**10. 無效查詢參數**
 ```bash
 curl "http://localhost:3000/api/entries?page=abc&pageSize=xyz"
 
@@ -377,8 +311,7 @@ GAS 應實現以下 action：
 | Action | 方法 | 返回格式 | 說明 |
 |--------|------|---------|------|
 | `getEntries` | POST | JSON | 返回 `{ ok: true, rows: [...] }` |
-| `resendEmail` | POST | JSON | 返回 `{ ok: true, messageId: "..." }` 或錯誤 |
-| `getStats` | POST | JSON | 返回 `{ ok: true, total, success, pending, failed, retry }` |
+| `getStats` | POST | JSON | 返回 `{ ok: true, total, success, pending, failed }` |
 | `exportCsv` | POST | CSV 文本 | 返回 CSV 內容 |
 
 GAS 側可參考的請求格式：
@@ -386,9 +319,6 @@ GAS 側可參考的請求格式：
 // Backend 發送的格式
 {
   action: "getEntries",
-  // 或
-  action: "resendEmail",
-  row: 15,
   // 或
   action: "getStats",
   // 或
