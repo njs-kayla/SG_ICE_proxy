@@ -181,7 +181,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     fetchSummaryData();
-    const interval = setInterval(fetchSummaryData, 60000); // 每分鐘刷新一次
+    const interval = setInterval(fetchSummaryData, 600000); // 10分鐘刷新一次
     return () => clearInterval(interval);
   }, []);
 
