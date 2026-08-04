@@ -403,8 +403,8 @@ export default function DashboardPage() {
                 </tr>
               ) : (
                 tableEntries.map((entry) => (
-                  <tr key={entry.row} className="hover:bg-gray-50 transition">
-                    <td className="whitespace-nowrap px-4 py-4 text-gray-600 font-medium sticky left-0 bg-white">
+                  <tr key={entry.row} className="hover:bg-[#fffbf2] transition">
+                    <td className="whitespace-nowrap px-4 py-4 text-gray-600 font-medium sticky left-0">
                       {formatTimestamp(entry.createdAt)}
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900">
