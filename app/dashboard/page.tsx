@@ -11,13 +11,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from "recharts";
-import {
-  RefreshCw,
-  Download,
-  Copy,
-  Check,
-  ChevronDown,
-} from "lucide-react";
+import { RefreshCw, Download, Copy, Check, ChevronDown } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { isMockMode } from "@/lib/mock-data";
 import { useDashboardHeaderActions } from "../../components/dashboard-header-actions-context";
@@ -35,6 +29,8 @@ interface Entry {
   name: string;
   email: string;
   company: string;
+  phone: string;
+  message: string;
   raffleCode: string;
   status: string;
 }
@@ -143,13 +139,17 @@ export default function DashboardPage() {
   const selectedDayIndex = dateFilter
     ? dailyData.findIndex((item) => item.dateKey === dateFilter)
     : activeDayIndex;
-  const activeDay = dailyData[selectedDayIndex] ?? dailyData[activeDayIndex] ?? dailyData[0];
-  const previousDay = selectedDayIndex > 0 ? dailyData[selectedDayIndex - 1] ?? null : null;
+  const activeDay =
+    dailyData[selectedDayIndex] ?? dailyData[activeDayIndex] ?? dailyData[0];
+  const previousDay =
+    selectedDayIndex > 0 ? (dailyData[selectedDayIndex - 1] ?? null) : null;
   const activeDayDelta = previousDay
     ? activeDay.entries - previousDay.entries
     : 0;
   const visibleEntries = dateFilter
-    ? entries.filter((entry) => toDateKey(entry.createdAt) === activeDay.dateKey)
+    ? entries.filter(
+        (entry) => toDateKey(entry.createdAt) === activeDay.dateKey,
+      )
     : entries;
   const activeDayCodes = visibleEntries
     .map((entry) => entry.raffleCode)
@@ -188,7 +188,9 @@ export default function DashboardPage() {
   useEffect(() => {
     setActions(
       <div className="flex flex-wrap items-center justify-end gap-2">
-        <span className="text-sm text-gray-500">Last updated {lastUpdated}</span>
+        <span className="text-sm text-gray-500">
+          Last updated {lastUpdated}
+        </span>
         <button
           onClick={fetchSummaryData}
           disabled={loading}
@@ -340,18 +342,22 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex gap-2">
-                { dateFilter && (
+                {dateFilter && (
                   <button
-                  onClick={handleCopyTodays}
-                  disabled={!activeDayCodes}
-                  className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg flex gap-2 items-center transition"
-                >
-                  {copied ? <Check size={16} /> : <Copy size={16} />}
-                  {copied ? "Copied!" : dateFilter ? `Copy ${activeDay.day} Codes` : "Copy All Codes"}
-                  <span className="px-2 bg-blue-600 text-white rounded-lg">
-                    {tableEntries.length}
-                  </span>
-                </button>
+                    onClick={handleCopyTodays}
+                    disabled={!activeDayCodes}
+                    className="px-3 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-semibold rounded-lg flex gap-2 items-center transition"
+                  >
+                    {copied ? <Check size={16} /> : <Copy size={16} />}
+                    {copied
+                      ? "Copied!"
+                      : dateFilter
+                        ? `Copy ${activeDay.day} Codes`
+                        : "Copy All Codes"}
+                    <span className="px-2 bg-blue-600 text-white rounded-lg">
+                      {tableEntries.length}
+                    </span>
+                  </button>
                 )}
               </div>
             </div>
@@ -373,6 +379,12 @@ export default function DashboardPage() {
                 </th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">
                   COMPANY
+                </th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                  CONTACT NUMBER
+                </th>
+                <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                  MESSAGE
                 </th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">
                   CODE
@@ -407,7 +419,7 @@ export default function DashboardPage() {
                     <td className="whitespace-nowrap px-4 py-4 text-gray-600 font-medium sticky left-0">
                       {formatTimestamp(entry.createdAt)}
                     </td>
-                    <td className="px-6 py-4 font-medium text-gray-900">
+                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap">
                       {entry.name}
                     </td>
                     <td className="px-6 py-4 text-gray-600 font-medium">
@@ -416,8 +428,14 @@ export default function DashboardPage() {
                     <td className="px-6 py-4 text-gray-600 font-medium">
                       {entry.company || "-"}
                     </td>
+                    <td className="px-6 py-4 text-gray-600 font-medium">
+                      {entry.phone || "-"}
+                    </td>
+                    <td className="px-6 py-4 text-gray-600 font-medium">
+                      {entry.message || "-"}
+                    </td>
                     <td className="px-6 py-4">
-                      <code className="px-3 py-1 font-bold bg-gray-100 text-gray-700 rounded">
+                      <code className="px-3 py-1 font-bold bg-gray-100 text-gray-700 rounded whitespace-nowrap">
                         {entry.raffleCode}
                       </code>
                     </td>
