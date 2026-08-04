@@ -15,7 +15,7 @@ export default function Header() {
     <header className="bg-white border-b border-gray-200 sticky top-0 z-30">
       <div className="px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
+          <h1 className="text-xl font-bold text-gray-900">SBC Lucky Draw Participants</h1>
         </div>
         
         <button

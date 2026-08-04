@@ -56,10 +56,7 @@ export default function LoginPage() {
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-2xl p-8 space-y-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome Back</h2>
-            <p className="text-gray-600">
-              {mockMode ? 'Local mock mode is enabled. Sign in to preview the UI with demo data.' : 'Enter your password to access the admin panel'}
-            </p>
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Welcome</h2>
           </div>
 
           {mockMode && (
@@ -117,11 +114,6 @@ export default function LoginPage() {
             Secure Admin Panel • Password Protected
           </div>
         </div>
-
-        {/* Security Notice */}
-        <p className="text-center text-gray-800 text-xs mt-6">
-          🔒 This is a secure area. Only authorized personnel should access.
-        </p>
       </div>
     </div>
   );
