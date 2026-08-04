@@ -310,7 +310,7 @@ export default function DashboardPage() {
 
       {/* Recent Entries Table */}
       <div className="bg-white rounded-lg shadow h-full overflow-y-auto">
-        <div className="sticky top-0 z-10 bg-white px-6 py-4 border-b border-gray-200">
+        <div className="sticky top-0 z-10 bg-white px-6 py-3 border-b border-gray-200">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
               <div className="flex gap-2">
@@ -358,14 +358,14 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="overflow-x-auto">
+        <div>
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="w-40 whitespace-nowrap px-4 py-3 text-left font-semibold text-gray-700">
+            <thead className="z-10">
+              <tr className="sticky top-[63px] bg-gray-50 border-b border-gray-200 z-10 shadow-sm">
+                <th className="w-40 whitespace-nowrap px-4 py-3 text-left font-semibold text-gray-700 left-0 bg-gray-50 sticky">
                   TIME
                 </th>
-                <th className="px-6 py-3 text-left font-semibold text-gray-700">
+                <th className="px-6 py-3 text-left font-semibold text-gray-700 ">
                   NAME
                 </th>
                 <th className="px-6 py-3 text-left font-semibold text-gray-700">
@@ -404,7 +404,7 @@ export default function DashboardPage() {
               ) : (
                 tableEntries.map((entry) => (
                   <tr key={entry.row} className="hover:bg-gray-50 transition">
-                    <td className="whitespace-nowrap px-4 py-4 text-gray-600 font-medium">
+                    <td className="whitespace-nowrap px-4 py-4 text-gray-600 font-medium sticky left-0 bg-white">
                       {formatTimestamp(entry.createdAt)}
                     </td>
                     <td className="px-6 py-4 font-medium text-gray-900">
