@@ -227,7 +227,7 @@ export default function DashboardPage() {
     );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 h-full flex flex-col">
       {message && (
         <div className="rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
           {message}
@@ -271,7 +271,7 @@ export default function DashboardPage() {
           </p>
         </div>
 
-        <div className="bg-white rounded-lg shadow p-6 flex flex-col items-center justify-end text-center">
+        <div className="bg-white rounded-lg shadow pt-6 pb-0 flex flex-col items-center justify-between text-center">
           <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
             Daily Breakdown
           </p>
@@ -284,7 +284,7 @@ export default function DashboardPage() {
                   tickLine={false}
                   fontSize={12}
                 />
-                <Tooltip />
+                <Tooltip cursor={false} />
                 <Bar
                   dataKey="entries"
                   fill="#3b82f6"
@@ -309,8 +309,8 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Entries Table */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white rounded-lg shadow h-full overflow-y-auto">
+        <div className="sticky top-0 z-10 bg-white px-6 py-4 border-b border-gray-200">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-end">
             <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
               <div className="flex gap-2">
